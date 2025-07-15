@@ -1,0 +1,1644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradeOS - The Trader's Intranet</title>
+    <!-- Inter font from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Chart.js for charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Global Styles & Variables */
+        :root {
+            --bg-color-dark: #1a1a2e;
+            --primary-color-dark: #0f3460;
+            --secondary-color-dark: #e94560;
+            --text-color-dark: #e0e0e0;
+            --border-color-dark: #000000;
+            --window-bg-dark: #2c2c4a;
+            --window-border-dark: #4a4a6e;
+            --taskbar-bg-dark: #16213e;
+            --start-menu-bg-dark: #16213e;
+            --hover-color-dark: #3e5c76;
+            --active-glow-color-dark: rgba(233, 69, 96, 0.7); /* secondary-color with transparency */
+            --icon-color-dark: #00ff7f; /* Vibrant Green for icons */
+
+            --bg-color-light: #f0f2f5;
+            --primary-color-light: #4a90e2;
+            --secondary-color-light: #ff6f61;
+            --text-color-light: #333333;
+            --border-color-light: #cccccc;
+            --window-bg-light: #ffffff;
+            --window-border-light: #dddddd;
+            --taskbar-bg-light: #e0e0e0;
+            --start-menu-bg-light: #e0e0e0;
+            --hover-color-light: #cfe2f3;
+            --active-glow-color-light: rgba(74, 144, 226, 0.7); /* primary-color with transparency */
+            --icon-color-light: #00b359; /* Slightly darker vibrant green for light theme */
+
+            /* RGB Glow Effect Variables */
+            --glow-color-1: #ff00ff; /* Magenta */
+            --glow-color-2: #00ffff; /* Cyan */
+            --glow-color-3: #ffff00; /* Yellow */
+        }
+
+        /* Dark Theme (Default) */
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            overflow: hidden; /* Prevent scrollbars for desktop simulation */
+            background-color: var(--bg-color-dark);
+            color: var(--text-color-dark);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            height: 100vh; /* Full viewport height */
+            width: 100vw; /* Full viewport width */
+            /* RGB Glow Effect - Applied to body for full screen */
+            box-shadow:
+                0 0 10px var(--glow-color-1),
+                0 0 20px var(--glow-color-2),
+                0 0 30px var(--glow-color-3);
+            animation: rgb-glow 10s infinite alternate;
+        }
+
+        @keyframes rgb-glow {
+            0% { box-shadow: 0 0 10px var(--glow-color-1), 0 0 20px var(--glow-color-2), 0 0 30px var(--glow-color-3); }
+            33% { box-shadow: 0 0 10px var(--glow-color-2), 0 0 20px var(--glow-color-3), 0 0 30px var(--glow-color-1); }
+            66% { box-shadow: 0 0 10px var(--glow-color-3), 0 0 20px var(--glow-color-1), 0 0 30px var(--glow-color-2); }
+            100% { box-shadow: 0 0 10px var(--glow-color-1), 0 0 20px var(--glow-color-2), 0 0 30px var(--glow-color-3); }
+        }
+
+        /* Light Theme */
+        body.light-theme {
+            background-color: var(--bg-color-light);
+            color: var(--text-color-light);
+        }
+
+        body.light-theme #desktop {
+            background-image: url('https://placehold.co/1920x1080/cfe2f3/333333?text=TradeOS+Light+Theme'); /* Light theme wallpaper */
+        }
+
+        body.light-theme .window {
+            background-color: var(--window-bg-light);
+            border: 1px solid var(--window-border-light);
+            color: var(--text-color-light);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-theme .window-title-bar {
+            background-color: var(--primary-color-light);
+            color: #ffffff;
+        }
+
+        body.light-theme .window-button {
+            background-color: var(--primary-color-light);
+            color: #ffffff;
+        }
+
+        body.light-theme .taskbar {
+            background-color: var(--taskbar-bg-light);
+            border-top: 1px solid var(--border-color-light);
+        }
+
+        body.light-theme .start-button,
+        body.light-theme .taskbar-widget,
+        body.light-theme .desktop-icon {
+            background-color: var(--taskbar-bg-light);
+            color: var(--text-color-light);
+        }
+
+        body.light-theme .start-button:hover,
+        body.light-theme .taskbar-widget:hover,
+        body.light-theme .desktop-icon:hover {
+            background-color: var(--hover-color-light);
+        }
+
+        body.light-theme #start-menu {
+            background-color: var(--start-menu-bg-light);
+            border: 1px solid var(--border-color-light);
+        }
+
+        body.light-theme #start-menu a {
+            color: var(--text-color-light);
+        }
+
+        body.light-theme #start-menu a:hover {
+            background-color: var(--hover-color-light);
+        }
+
+        body.light-theme .desktop-icon i,
+        body.light-theme #start-menu a i,
+        body.light-theme .taskbar-widget i {
+            color: var(--icon-color-light); /* Light theme icon color */
+        }
+
+
+        /* Desktop Area */
+        #desktop {
+            flex-grow: 1;
+            position: relative;
+            background-image: url('https://placehold.co/1920x1080/1a1a2e/e0e0e0?text=TradeOS+Dark+Theme'); /* Futuristic finance wallpaper */
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-wrap: wrap;
+            align-content: flex-start; /* Align icons to the top */
+            padding: 20px;
+            /* RGB Glow Effect removed from desktop, now on body */
+        }
+
+        /* Desktop Icons */
+        .desktop-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 15px;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 8px;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+            width: 80px; /* Fixed width for icons */
+            text-align: center;
+        }
+
+        .desktop-icon:hover {
+            background-color: var(--hover-color-dark);
+            transform: translateY(-3px);
+        }
+
+        .desktop-icon i {
+            font-size: 3em;
+            margin-bottom: 8px;
+            color: var(--icon-color-dark); /* Vibrant Green for icons */
+        }
+
+        .desktop-icon span {
+            font-size: 0.9em;
+            word-break: break-word; /* Allow long names to break */
+        }
+
+        /* Taskbar */
+        .taskbar {
+            background-color: var(--taskbar-bg-dark);
+            height: 50px;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            border-top: 1px solid var(--border-color-dark);
+            position: relative;
+            z-index: 1000; /* Ensure taskbar is on top */
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .start-button {
+            background-color: var(--primary-color-dark);
+            color: var(--text-color-dark);
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-right: 20px;
+            transition: background-color 0.2s ease;
+        }
+
+        .start-button:hover {
+            background-color: var(--hover-color-dark);
+        }
+
+        .taskbar-widgets {
+            display: flex;
+            align-items: center;
+            flex-grow: 1;
+            justify-content: flex-end; /* Align widgets to the right */
+        }
+
+        .taskbar-widget {
+            padding: 5px 10px;
+            margin-left: 10px;
+            background-color: transparent;
+            border-radius: 5px;
+            transition: background-color 0.2s ease;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+        }
+
+        .taskbar-widget i {
+            margin-right: 5px;
+            color: var(--icon-color-dark); /* Vibrant Green for icons */
+        }
+
+        .taskbar-widget:hover {
+            background-color: var(--hover-color-dark);
+        }
+
+        #mini-price-ticker {
+            min-width: 150px; /* Ensure enough space for ticker */
+            text-align: right;
+        }
+
+        #trade-alerts-widget {
+            position: relative; /* For alert popups */
+        }
+
+        /* Notification/Alert Box */
+        .notification-box {
+            position: absolute;
+            bottom: 60px; /* Above taskbar */
+            right: 20px;
+            background-color: #333;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            z-index: 1001;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            min-width: 250px;
+            max-width: 350px;
+        }
+
+        .notification-box.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .notification-box.trade-alert {
+            background-color: var(--secondary-color-dark);
+            color: white;
+        }
+
+        .notification-box .close-btn {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            cursor: pointer;
+            font-size: 1.2em;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Start Menu */
+        #start-menu {
+            position: absolute;
+            bottom: 60px; /* Above taskbar */
+            left: 10px;
+            background-color: var(--start-menu-bg-dark);
+            border: 1px solid var(--border-color-dark);
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            width: 250px;
+            padding: 10px 0;
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            z-index: 999;
+        }
+
+        #start-menu.show {
+            display: flex;
+        }
+
+        #start-menu a {
+            padding: 10px 15px;
+            color: var(--text-color-dark);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.2s ease;
+        }
+
+        #start-menu a i {
+            margin-right: 10px;
+            color: var(--icon-color-dark); /* Vibrant Green for icons */
+        }
+
+        #start-menu a:hover {
+            background-color: var(--hover-color-dark);
+        }
+
+        /* Windows */
+        .window {
+            position: absolute;
+            background-color: var(--window-bg-dark);
+            border: 1px solid var(--window-border-dark);
+            border-radius: 10px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+            min-width: 300px;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            resize: both; /* Allow resizing */
+            overflow: auto; /* For content that exceeds window size */
+            z-index: 1; /* Base z-index */
+            transition: box-shadow 0.2s ease; /* For glowing border */
+            left: 50%; /* Initial positioning */
+            top: 50%;
+            transform: translate(-50%, -50%); /* Center the window */
+        }
+
+        .window.active {
+            box-shadow:
+                0 0 15px var(--active-glow-color-dark),
+                0 0 30px var(--active-glow-color-dark);
+        }
+
+        body.light-theme .window.active {
+            box-shadow:
+                0 0 15px var(--active-glow-color-light),
+                0 0 30px var(--active-glow-color-light);
+        }
+
+        .window-title-bar {
+            background-color: var(--primary-color-dark);
+            color: white;
+            padding: 10px 15px;
+            cursor: grab;
+            border-top-left-radius: 9px;
+            border-top-right-radius: 9px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+        }
+
+        .window-title-bar.grabbing {
+            cursor: grabbing;
+        }
+
+        .window-buttons {
+            display: flex;
+        }
+
+        .window-button {
+            background-color: var(--secondary-color-dark);
+            color: white;
+            border: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.8em;
+            cursor: pointer;
+            margin-left: 8px;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .window-button:hover {
+            transform: scale(1.1);
+        }
+
+        .window-button.minimize { background-color: #fdd835; } /* Yellow */
+        .window-button.close { background-color: #ef5350; } /* Red */
+
+        .window-content {
+            padding: 15px;
+            flex-grow: 1;
+            overflow-y: auto; /* Enable scrolling for content */
+        }
+
+        /* Specific Window Styles */
+        #trading-dashboard-window .window-content {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        #trading-dashboard-window .price-mock {
+            display: flex;
+            justify-content: space-around;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+        }
+        #trading-dashboard-window .price-item {
+            text-align: center;
+        }
+        #trading-dashboard-window .price-item .value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #4CAF50; /* Green for positive */
+        }
+        #trading-dashboard-window .price-item .label {
+            font-size: 0.8em;
+            color: #aaa;
+        }
+        #trading-dashboard-window canvas {
+            max-width: 100%;
+            height: auto; /* Maintain aspect ratio */
+        }
+
+        #wallet-window .window-content,
+        #reports-window .window-content,
+        #news-feed-window .window-content {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        #wallet-window .balance-info {
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1.2em;
+        }
+        #wallet-window .balance-info span {
+            font-weight: bold;
+            color: #64ffda; /* Cyan accent */
+        }
+        #wallet-window .asset-list ul {
+            list-style: none;
+            padding: 0;
+        }
+        #wallet-window .asset-list li {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+        #wallet-window .asset-list li:last-child {
+            border-bottom: none;
+        }
+
+        #calendar-window .window-content {
+            padding: 0; /* Calendar content will fill */
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            padding: 10px;
+            text-align: center;
+        }
+        .calendar-header {
+            font-weight: bold;
+            color: var(--secondary-color-dark);
+        }
+        .calendar-day {
+            padding: 8px 5px;
+            border-radius: 5px;
+            background-color: rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .calendar-day.has-event {
+            background-color: var(--primary-color-dark);
+            color: white;
+        }
+        .calendar-day:hover {
+            background-color: var(--hover-color-dark);
+        }
+        .calendar-event-details {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+
+        #reports-window .report-item {
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #reports-window .report-item a {
+            color: var(--secondary-color-dark);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        #reports-window .report-item a:hover {
+            text-decoration: underline;
+        }
+
+        #analyst-chat-window .chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        #analyst-chat-window .chat-input-area {
+            display: flex;
+            gap: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        #analyst-chat-window .chat-input-area input {
+            flex-grow: 1;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid var(--window-border-dark);
+            background-color: var(--primary-color-dark);
+            color: var(--text-color-dark);
+        }
+        #analyst-chat-window .chat-input-area button {
+            padding: 8px 15px;
+            background-color: var(--secondary-color-dark);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        #analyst-chat-window .chat-input-area button:hover {
+            background-color: #c0392b;
+        }
+        .chat-message {
+            padding: 8px 12px;
+            border-radius: 15px;
+            max-width: 80%;
+        }
+        .chat-message.user {
+            background-color: var(--primary-color-dark);
+            align-self: flex-end;
+        }
+        .chat-message.analyst {
+            background-color: #3e5c76;
+            align-self: flex-start;
+        }
+        .chat-message .sender {
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-bottom: 3px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .chat-message .text {
+            font-size: 0.95em;
+        }
+
+        #risk-calculator-window .form-group {
+            margin-bottom: 10px;
+        }
+        #risk-calculator-window label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        #risk-calculator-window input {
+            width: calc(100% - 20px);
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid var(--window-border-dark);
+            background-color: var(--primary-color-dark);
+            color: var(--text-color-dark);
+        }
+        #risk-calculator-window button {
+            padding: 10px 20px;
+            background-color: var(--secondary-color-dark);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            margin-top: 15px;
+        }
+        #risk-calculator-window button:hover {
+            background-color: #c0392b;
+        }
+        #risk-calculator-window .results {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+        #risk-calculator-window .results p {
+            margin: 5px 0;
+        }
+        #risk-calculator-window .results span {
+            font-weight: bold;
+            color: #64ffda;
+        }
+
+        #backtest-tool-window .strategy-input {
+            width: calc(100% - 20px);
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid var(--window-border-dark);
+            background-color: var(--primary-color-dark);
+            color: var(--text-color-dark);
+            margin-bottom: 10px;
+        }
+        #backtest-tool-window button {
+            padding: 10px 20px;
+            background-color: var(--secondary-color-dark);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        #backtest-tool-window button:hover {
+            background-color: #c0392b;
+        }
+        #backtest-tool-window .backtest-results {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+        #backtest-tool-window .backtest-results p {
+            margin: 5px 0;
+        }
+        #backtest-tool-window .backtest-results span {
+            font-weight: bold;
+            color: #64ffda;
+        }
+
+        #news-feed-window .news-item {
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 8px;
+        }
+        #news-feed-window .news-item .headline {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        #news-feed-window .news-item .source {
+            font-size: 0.8em;
+            color: #aaa;
+        }
+
+        /* Theme Toggle Button */
+        #theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: var(--primary-color-dark);
+            color: var(--text-color-dark);
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            z-index: 1001;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #theme-toggle:hover {
+            background-color: var(--hover-color-dark);
+        }
+
+        body.light-theme #theme-toggle {
+            background-color: var(--primary-color-light);
+            color: white;
+        }
+        body.light-theme #theme-toggle:hover {
+            background-color: var(--hover-color-light);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .desktop-icon {
+                margin: 10px;
+                width: 70px;
+            }
+
+            .desktop-icon i {
+                font-size: 2.5em;
+            }
+
+            .desktop-icon span {
+                font-size: 0.8em;
+            }
+
+            .taskbar {
+                height: 45px;
+                padding: 0 5px;
+            }
+
+            .start-button {
+                padding: 6px 10px;
+                margin-right: 10px;
+            }
+
+            .taskbar-widget {
+                padding: 3px 8px;
+                margin-left: 5px;
+                font-size: 0.8em;
+            }
+
+            #mini-price-ticker {
+                min-width: 100px;
+            }
+
+            #start-menu {
+                width: 200px;
+                bottom: 50px;
+                left: 5px;
+            }
+
+            #start-menu a {
+                padding: 8px 10px;
+                font-size: 0.9em;
+            }
+
+            .window {
+                min-width: 95%; /* Make windows almost full width on mobile */
+                min-height: 80vh; /* Make windows taller on mobile */
+                left: 2.5%;
+                top: 5%;
+                transform: none; /* Remove centering transform */
+                resize: none; /* Disable resizing on small screens */
+            }
+
+            .window-title-bar {
+                padding: 8px 10px;
+                font-size: 0.9em;
+            }
+
+            .window-button {
+                width: 20px;
+                height: 20px;
+                font-size: 0.7em;
+                margin-left: 5px;
+            }
+
+            .window-content {
+                padding: 10px;
+            }
+
+            .notification-box {
+                bottom: 55px;
+                right: 10px;
+                min-width: 200px;
+                max-width: 90%;
+                font-size: 0.9em;
+            }
+
+            #theme-toggle {
+                top: 10px;
+                right: 10px;
+                padding: 8px 12px;
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button id="theme-toggle">
+        <i class="fas fa-sun"></i> <span id="theme-text">Light Mode</span>
+    </button>
+
+    <div id="desktop">
+        <!-- Desktop Icons -->
+        <div class="desktop-icon" id="icon-trading-dashboard" data-window-id="trading-dashboard-window">
+            <i class="fas fa-chart-line"></i>
+            <span>Trading Dashboard</span>
+        </div>
+        <div class="desktop-icon" id="icon-wallet" data-window-id="wallet-window">
+            <i class="fas fa-wallet"></i>
+            <span>Wallet</span>
+        </div>
+        <div class="desktop-icon" id="icon-reports" data-window-id="reports-window">
+            <i class="fas fa-file-alt"></i>
+            <span>Reports</span>
+        </div>
+        <div class="desktop-icon" id="icon-calendar" data-window-id="calendar-window">
+            <i class="fas fa-calendar-alt"></i>
+            <span>Economic Calendar</span>
+        </div>
+        <div class="desktop-icon" id="icon-analyst-chat" data-window-id="analyst-chat-window">
+            <i class="fas fa-comments"></i>
+            <span>Analyst Chat</span>
+        </div>
+        <div class="desktop-icon" id="icon-risk-calculator" data-window-id="risk-calculator-window">
+            <i class="fas fa-calculator"></i>
+            <span>Risk Calculator</span>
+        </div>
+        <div class="desktop-icon" id="icon-backtest-tool" data-window-id="backtest-tool-window">
+            <i class="fas fa-history"></i>
+            <span>Backtest Tool</span>
+        </div>
+        <div class="desktop-icon" id="icon-news-feed" data-window-id="news-feed-window">
+            <i class="fas fa-newspaper"></i>
+            <span>News Feed</span>
+        </div>
+    </div>
+
+    <!-- Taskbar -->
+    <div class="taskbar">
+        <div class="start-button" id="start-button">
+            <i class="fas fa-bars"></i> Start
+        </div>
+        <div class="taskbar-widgets">
+            <div class="taskbar-widget" id="mini-price-ticker">
+                <i class="fas fa-dollar-sign"></i> <span id="ticker-value">BTC: $0.00</span>
+            </div>
+            <div class="taskbar-widget" id="trade-alerts-widget">
+                <i class="fas fa-bell"></i> Alerts
+            </div>
+            <div class="taskbar-widget" id="clock-widget">
+                <i class="fas fa-clock"></i> <span id="current-time"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Start Menu -->
+    <div id="start-menu">
+        <a href="#" data-window-id="trading-dashboard-window"><i class="fas fa-chart-line"></i> Trading Dashboard</a>
+        <a href="#" data-window-id="wallet-window"><i class="fas fa-wallet"></i> Wallet</a>
+        <a href="#" data-window-id="reports-window"><i class="fas fa-file-alt"></i> Reports</a>
+        <a href="#" data-window-id="calendar-window"><i class="fas fa-calendar-alt"></i> Economic Calendar</a>
+        <a href="#" data-window-id="analyst-chat-window"><i class="fas fa-comments"></i> Analyst Chat</a>
+        <a href="#" data-window-id="risk-calculator-window"><i class="fas fa-calculator"></i> Risk Calculator</a>
+        <a href="#" data-window-id="backtest-tool-window"><i class="fas fa-history"></i> Backtest Tool</a>
+        <a href="#" id="start-menu-theme-toggle"><i class="fas fa-adjust"></i> Toggle Theme</a>
+    </div>
+
+    <!-- Notification Box (hidden by default) -->
+    <div class="notification-box" id="notification-box">
+        <span class="close-btn">&times;</span>
+        <div id="notification-content"></div>
+    </div>
+
+    <!-- Windows Container -->
+    <div id="windows-container">
+        <!-- Trading Dashboard Window -->
+        <div class="window" id="trading-dashboard-window" style="width: 700px; height: 500px; display: none;">
+            <div class="window-title-bar">
+                <span>Trading Dashboard</span>
+                <div class="window-buttons">
+                    <button class="window-button minimize" data-action="minimize"><i class="fas fa-minus"></i></button>
+                    <button class="window-button close" data-action="close"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="price-mock">
+                    <div class="price-item">
+                        <div class="label">BTC/USD</div>
+                        <div class="value" id="btc-price">$65,432.10</div>
+                    </div>
+                    <div class="price-item">
+                        <div class="label">ETH/USD</div>
+                        <div class="value" id="eth-price">$3,456.78</div>
+                    </div>
+                    <div class="price-item">
+                        <div class="label">SPX</div>
+                        <div class="value" id="spx-price">5,234.56</div>
+                    </div>
+                </div>
+                <canvas id="tradingChart"></canvas>
+                <p>Simulated real-time market data and charts.</p>
+            </div>
+        </div>
+
+        <!-- Wallet Window -->
+        <div class="window" id="wallet-window" style="width: 400px; height: 350px; display: none;">
+            <div class="window-title-bar">
+                <span>Wallet</span>
+                <div class="window-buttons">
+                    <button class="window-button minimize" data-action="minimize"><i class="fas fa-minus"></i></button>
+                    <button class="window-button close" data-action="close"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="balance-info">
+                    Total Balance: <span id="total-balance">$1,234,567.89</span>
+                </div>
+                <h3>Asset Overview</h3>
+                <div class="asset-list">
+                    <ul>
+                        <li>Bitcoin (BTC)<span>0.5 BTC</span></li>
+                        <li>Ethereum (ETH)<span>10 ETH</span></li>
+                        <li>USD Cash<span>$50,000</span></li>
+                        <li>Gold (XAU)<span>20 oz</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reports Window -->
+        <div class="window" id="reports-window" style="width: 500px; height: 400px; display: none;">
+            <div class="window-title-bar">
+                <span>Reports</span>
+                <div class="window-buttons">
+                    <button class="window-button minimize" data-action="minimize"><i class="fas fa-minus"></i></button>
+                    <button class="window-button close" data-action="close"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+            <div class="window-content">
+                <h3>Quarterly Performance Reports</h3>
+                <div class="report-item">
+                    <span>Q2 2025 Performance Summary</span>
+                    <a href="#" class="download-report" data-report-name="Q2 2025 Performance Summary">Download PDF</a>
+                </div>
+                <div class="report-item">
+                    <span>Q1 2025 Market Analysis</span>
+                    <a href="#" class="download-report" data-report-name="Q1 2025 Market Analysis">Download PDF</a>
+                </div>
+                <div class="report-item">
+                    <span>2024 Annual Review</span>
+                    <a href="#" class="download-report" data-report-name="2024 Annual Review">Download PDF</a>
+                </div>
+                <h3>Custom Reports</h3>
+                <div class="report-item">
+                    <span>My Portfolio Allocation (HTML Chart)</span>
+                    <a href="#" class="download-report" data-report-name="My Portfolio Allocation Chart">View Chart</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Economic Calendar Window -->
+        <div class="window" id="calendar-window" style="width: 600px; height: 450px; display: none;">
+            <div class="window-title-bar">
+                <span>Economic Calendar</span>
+                <div class="window-buttons">
+                    <button class="window-button minimize" data-action="minimize"><i class="fas fa-minus"></i></button>
+                    <button class="window-button close" data-action="close"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+            <div class="window-content">
+                <h3 style="text-align: center; margin-bottom: 15px;">July 2025</h3>
+                <div class="calendar-grid">
+                    <div class="calendar-header">Sun</div>
+                    <div class="calendar-header">Mon</div>
+                    <div class="calendar-header">Tue</div>
+                    <div class="calendar-header">Wed</div>
+                    <div class="calendar-header">Thu</div>
+                    <div class="calendar-header">Fri</div>
+                    <div class="calendar-header">Sat</div>
+                    <!-- Days of the month - example with events -->
+                    <div class="calendar-day"></div> <!-- Filler for start of month -->
+                    <div class="calendar-day"></div>
+                    <div class="calendar-day">1</div>
+                    <div class="calendar-day">2</div>
+                    <div class="calendar-day has-event" data-event="FOMC Meeting Minutes Release">3</div>
+                    <div class="calendar-day">4</div>
+                    <div class="calendar-day">5</div>
+                    <div class="calendar-day">6</div>
+                    <div class="calendar-day">7</div>
+                    <div class="calendar-day has-event" data-event="AAPL Earnings Call">8</div>
+                    <div class="calendar-day">9</div>
+                    <div class="calendar-day">10</div>
+                    <div class="calendar-day">11</div>
+                    <div class="calendar-day">12</div>
+                    <div class="calendar-day">13</div>
+                    <div class="calendar-day has-event" data-event="ECB Interest Rate Decision">14</div>
+                    <div class="calendar-day">15</div>
+                    <div class="calendar-day">16</div>
+                    <div class="calendar-day">17</div>
+                    <div class="calendar-day has-event" data-event="US CPI Data Release">18</div>
+                    <div class="calendar-day">19</div>
+                    <div class="calendar-day">20</div>
+                    <div class="calendar-day">21</div>
+                    <div class="calendar-day">22</div>
+                    <div class="calendar-day">23</div>
+                    <div class="calendar-day has-event" data-event="TSLA Battery Day">24</div>
+                    <div class="calendar-day">25</div>
+                    <div class="calendar-day">26</div>
+                    <div class="calendar-day">27</div>
+                    <div class="calendar-day">28</div>
+                    <div class="calendar-day">29</div>
+                    <div class="calendar-day has-event" data-event="Non-Farm Payrolls">30</div>
+                    <div class="calendar-day">31</div>
+                </div>
+                <div class="calendar-event-details" id="calendar-event-details">
+                    Click on a highlighted date to see event details.
+                </div>
+            </div>
+        </div>
+
+        <!-- Analyst Chat Window -->
+        <div class="window" id="analyst-chat-window" style="width: 450px; height: 500px; display: none;">
+            <div class="window-title-bar">
+                <span>Analyst Chat</span>
+                <div class="window-buttons">
+                    <button class="window-button minimize" data-action="minimize"><i class="fas fa-minus"></i></button>
+                    <button class="window-button close" data-action="close"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+            <div class="window-content" style="display: flex; flex-direction: column;">
+                <div class="chat-messages" id="chat-messages">
+                    <div class="chat-message analyst">
+                        <div class="sender">Analyst Jane</div>
+                        <div class="text">Good morning team! Keep an eye on tech stocks today, especially after the latest earnings reports.</div>
+                    </div>
+                    <div class="chat-message user">
+                        <div class="sender">You</div>
+                        <div class="text">Morning Jane! Any specific tickers you're watching?</div>
+                    </div>
+                    <div class="chat-message analyst">
+                        <div class="sender">Analyst Jane</div>
+                        <div class="text">AAPL and MSFT could see some volatility. Also, the energy sector is showing some interesting patterns.</div>
+                    </div>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" id="chat-input" placeholder="Type your message...">
+                    <button id="send-chat-btn">Send</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Risk Calculator Window -->
+        <div class="window" id="risk-calculator-window" style="width: 400px; height: 450px; display: none;">
+            <div class="window-title-bar">
+                <span>Risk Calculator</span>
+                <div class="window-buttons">
+                    <button class="window-button minimize" data-action="minimize"><i class="fas fa-minus"></i></button>
+                    <button class="window-button close" data-action="close"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="form-group">
+                    <label for="capital">Total Capital ($):</label>
+                    <input type="number" id="capital" value="100000" step="1000">
+                </div>
+                <div class="form-group">
+                    <label for="risk-percent">Risk per Trade (% of Capital):</label>
+                    <input type="number" id="risk-percent" value="1" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label for="entry-price">Entry Price:</label>
+                    <input type="number" id="entry-price" value="100" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="stop-loss-price">Stop Loss Price:</label>
+                    <input type="number" id="stop-loss-price" value="98" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="target-price">Target Price (Optional):</label>
+                    <input type="number" id="target-price" value="105" step="0.01">
+                </div>
+                <button id="calculate-risk-btn">Calculate</button>
+                <div class="results" id="risk-calculator-results">
+                    <p>Risk Amount: <span>$0.00</span></p>
+                    <p>Shares/Units: <span>0</span></p>
+                    <p>Risk per Share: <span>$0.00</span></p>
+                    <p>Potential Reward: <span>$0.00</span></p>
+                    <p>Risk:Reward Ratio: <span>0:0</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Backtest Tool Window -->
+        <div class="window" id="backtest-tool-window" style="width: 500px; height: 400px; display: none;">
+            <div class="window-title-bar">
+                <span>Backtest Tool</span>
+                <div class="window-buttons">
+                    <button class="window-button minimize" data-action="minimize"><i class="fas fa-minus"></i></button>
+                    <button class="window-button close" data-action="close"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+            <div class="window-content">
+                <h3>Input Strategy Parameters (Mock)</h3>
+                <textarea id="strategy-input" class="strategy-input" rows="5" placeholder="e.g., 'Buy when RSI < 30, Sell when RSI > 70'"></textarea>
+                <button id="run-backtest-btn">Run Backtest</button>
+                <div class="backtest-results" id="backtest-results">
+                    <p>Historical Results:</p>
+                    <p>Total Trades: <span>0</span></p>
+                    <p>Winning Trades: <span>0</span></p>
+                    <p>Losing Trades: <span>0</span></p>
+                    <p>Net Profit/Loss: <span>$0.00</span></p>
+                    <p>Win Rate: <span>0%</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- News Feed Window -->
+        <div class="window" id="news-feed-window" style="width: 450px; height: 400px; display: none;">
+            <div class="window-title-bar">
+                <span>News Feed</span>
+                <div class="window-buttons">
+                    <button class="window-button minimize" data-action="minimize"><i class="fas fa-minus"></i></button>
+                    <button class="window-button close" data-action="close"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+            <div class="window-content" id="news-feed-content">
+                <!-- News items will be injected here by JS -->
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const desktop = document.getElementById('desktop');
+            const startButton = document.getElementById('start-button');
+            const startMenu = document.getElementById('start-menu');
+            const themeToggle = document.getElementById('theme-toggle');
+            const startMenuThemeToggle = document.getElementById('start-menu-theme-toggle');
+            const themeText = document.getElementById('theme-text');
+            const windowsContainer = document.getElementById('windows-container');
+            const desktopIcons = document.querySelectorAll('.desktop-icon');
+            const startMenuItems = document.querySelectorAll('#start-menu a:not(#start-menu-theme-toggle)');
+            const notificationBox = document.getElementById('notification-box');
+            const notificationContent = document.getElementById('notification-content');
+            const notificationCloseBtn = notificationBox.querySelector('.close-btn');
+
+            let activeWindow = null;
+            let zIndexCounter = 10; // To manage window stacking
+
+            // --- Theme Management ---
+            const currentTheme = localStorage.getItem('tradeos-theme') || 'dark';
+            if (currentTheme === 'light') {
+                document.body.classList.add('light-theme');
+                themeText.textContent = 'Dark Mode';
+                themeToggle.querySelector('i').classList.replace('fa-sun', 'fa-moon');
+            } else {
+                themeText.textContent = 'Light Mode';
+                themeToggle.querySelector('i').classList.replace('fa-moon', 'fa-sun');
+            }
+
+            const toggleTheme = () => {
+                document.body.classList.toggle('light-theme');
+                const isLightTheme = document.body.classList.contains('light-theme');
+                localStorage.setItem('tradeos-theme', isLightTheme ? 'light' : 'dark');
+                themeText.textContent = isLightTheme ? 'Dark Mode' : 'Light Mode';
+                themeToggle.querySelector('i').classList.replace(isLightTheme ? 'fa-sun' : 'fa-moon', isLightTheme ? 'fa-moon' : 'fa-sun');
+            };
+
+            themeToggle.addEventListener('click', toggleTheme);
+            startMenuThemeToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                toggleTheme();
+                startMenu.classList.remove('show'); // Close start menu after toggling
+            });
+
+            // --- Start Menu Toggle ---
+            startButton.addEventListener('click', (event) => {
+                event.stopPropagation(); // Prevent click from closing immediately
+                startMenu.classList.toggle('show');
+            });
+
+            // Close start menu if clicked outside
+            document.addEventListener('click', (event) => {
+                if (!startMenu.contains(event.target) && !startButton.contains(event.target)) {
+                    startMenu.classList.remove('show');
+                }
+            });
+
+            // --- Window Management ---
+            const windows = document.querySelectorAll('.window');
+
+            const openWindow = (windowId) => {
+                const windowElement = document.getElementById(windowId);
+                if (windowElement) {
+                    windowElement.style.display = 'flex';
+                    bringWindowToFront(windowElement);
+                    startMenu.classList.remove('show'); // Close start menu
+                }
+            };
+
+            const closeWindow = (windowElement) => {
+                windowElement.style.display = 'none';
+                windowElement.classList.remove('active');
+                if (activeWindow === windowElement) {
+                    activeWindow = null;
+                }
+            };
+
+            const minimizeWindow = (windowElement) => {
+                // For simplicity, minimizing just hides the window.
+                // In a full OS simulation, it would typically move to a taskbar icon.
+                windowElement.style.display = 'none';
+                windowElement.classList.remove('active');
+                if (activeWindow === windowElement) {
+                    activeWindow = null;
+                }
+            };
+
+            const bringWindowToFront = (windowElement) => {
+                // Remove active class from previous active window
+                if (activeWindow && activeWindow !== windowElement) {
+                    activeWindow.classList.remove('active');
+                }
+                zIndexCounter++;
+                windowElement.style.zIndex = zIndexCounter;
+                windowElement.classList.add('active');
+                activeWindow = windowElement;
+            };
+
+            windows.forEach(windowElement => {
+                const titleBar = windowElement.querySelector('.window-title-bar');
+                const closeBtn = windowElement.querySelector('.window-button.close');
+                const minimizeBtn = windowElement.querySelector('.window-button.minimize');
+
+                // Close button
+                closeBtn.addEventListener('click', () => closeWindow(windowElement));
+                // Minimize button
+                minimizeBtn.addEventListener('click', () => minimizeWindow(windowElement));
+
+                // Bring to front on click anywhere in the window
+                windowElement.addEventListener('mousedown', () => bringWindowToFront(windowElement));
+
+                // Draggable functionality
+                let isDragging = false;
+                let offsetX, offsetY;
+
+                titleBar.addEventListener('mousedown', (e) => {
+                    isDragging = true;
+                    titleBar.classList.add('grabbing');
+                    offsetX = e.clientX - windowElement.getBoundingClientRect().left;
+                    offsetY = e.clientY - windowElement.getBoundingClientRect().top;
+                    bringWindowToFront(windowElement); // Bring to front when dragging starts
+                });
+
+                desktop.addEventListener('mousemove', (e) => {
+                    if (!isDragging) return;
+
+                    let newX = e.clientX - offsetX;
+                    let newY = e.clientY - offsetY;
+
+                    // Constrain window to desktop bounds
+                    const desktopRect = desktop.getBoundingClientRect();
+                    const windowRect = windowElement.getBoundingClientRect();
+
+                    newX = Math.max(0, Math.min(newX, desktopRect.width - windowRect.width));
+                    newY = Math.max(0, Math.min(newY, desktopRect.height - windowRect.height));
+
+                    windowElement.style.left = `${newX}px`;
+                    windowElement.style.top = `${newY}px`;
+                });
+
+                desktop.addEventListener('mouseup', () => {
+                    isDragging = false;
+                    titleBar.classList.remove('grabbing');
+                });
+
+                // Prevent text selection during drag
+                titleBar.addEventListener('selectstart', (e) => e.preventDefault());
+            });
+
+            // Open windows from desktop icons
+            desktopIcons.forEach(icon => {
+                icon.addEventListener('dblclick', () => {
+                    const windowId = icon.dataset.windowId;
+                    openWindow(windowId);
+                });
+            });
+
+            // Open windows from start menu
+            startMenuItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const windowId = item.dataset.windowId;
+                    openWindow(windowId);
+                });
+            });
+
+            // --- Taskbar Widgets ---
+            // Clock
+            const currentTimeSpan = document.getElementById('current-time');
+            const updateClock = () => {
+                const now = new Date();
+                currentTimeSpan.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            };
+            setInterval(updateClock, 1000);
+            updateClock(); // Initial call
+
+            // Mini Price Ticker
+            const tickerValueSpan = document.getElementById('ticker-value');
+            let btcPrice = 65432.10;
+            let ethPrice = 3456.78;
+            let spxPrice = 5234.56;
+            let tickerIndex = 0;
+            const tickers = ['BTC/USD', 'ETH/USD', 'SPX'];
+
+            const updateMiniPriceTicker = () => {
+                // Simulate price fluctuations
+                btcPrice += (Math.random() - 0.5) * 100; // +/- $50
+                ethPrice += (Math.random() - 0.5) * 10;   // +/- $5
+                spxPrice += (Math.random() - 0.5) * 2;    // +/- $1
+
+                btcPrice = Math.max(1000, btcPrice); // Prevent going too low
+                ethPrice = Math.max(100, ethPrice);
+                spxPrice = Math.max(1000, spxPrice);
+
+                tickerIndex = (tickerIndex + 1) % tickers.length;
+                const currentTicker = tickers[tickerIndex];
+                let displayValue;
+
+                switch (currentTicker) {
+                    case 'BTC/USD':
+                        displayValue = `BTC: $${btcPrice.toFixed(2)}`;
+                        break;
+                    case 'ETH/USD':
+                        displayValue = `ETH: $${ethPrice.toFixed(2)}`;
+                        break;
+                    case 'SPX':
+                        displayValue = `SPX: ${spxPrice.toFixed(2)}`;
+                        break;
+                }
+                tickerValueSpan.textContent = displayValue;
+            };
+            setInterval(updateMiniPriceTicker, 3000); // Update every 3 seconds
+            updateMiniPriceTicker(); // Initial call
+
+            // Trade Alerts Widget & Notification Box
+            const mockAlerts = [
+                "BUY ALERT: AAPL - Strong momentum detected!",
+                "SELL ALERT: TSLA - Price breaking support level.",
+                "NEWS FLASH: Fed announces unexpected rate hike.",
+                "RISK WARNING: High volatility in crypto markets.",
+                "OPPORTUNITY: EUR/USD - Potential breakout brewing."
+            ];
+            let alertIndex = 0;
+
+            /**
+             * Shows a custom notification message.
+             * @param {string} message The message to display.
+             * @param {string} type The type of notification ('default' or 'trade-alert').
+             * @param {number} duration How long the notification should be visible in milliseconds.
+             */
+            const showNotification = (message, type = 'default', duration = 5000) => {
+                notificationContent.innerHTML = ''; // Clear previous content
+                notificationContent.textContent = ''; // Clear for typewriter
+                notificationBox.classList.remove('trade-alert');
+                notificationBox.classList.remove('show'); // Hide before showing again for animation
+                void notificationBox.offsetWidth; // Trigger reflow to restart CSS animation
+
+                if (type === 'trade-alert') {
+                    notificationBox.classList.add('trade-alert');
+                }
+
+                notificationBox.classList.add('show');
+                typeWriter(notificationContent, message, () => {
+                    setTimeout(() => {
+                        notificationBox.classList.remove('show');
+                    }, duration);
+                });
+            };
+
+            notificationCloseBtn.addEventListener('click', () => {
+                notificationBox.classList.remove('show');
+            });
+
+            const triggerTradeAlert = () => {
+                const alertMessage = mockAlerts[alertIndex];
+                showNotification(alertMessage, 'trade-alert', 7000); // Show for 7 seconds
+                alertIndex = (alertIndex + 1) % mockAlerts.length;
+            };
+            setInterval(triggerTradeAlert, 15000); // Trigger a new alert every 15 seconds
+            // triggerTradeAlert(); // Initial alert on load
+
+            // Typewriter effect for notifications
+            function typeWriter(element, text, callback) {
+                let i = 0;
+                element.textContent = ''; // Clear existing text
+                function type() {
+                    if (i < text.length) {
+                        element.textContent += text.charAt(i);
+                        i++;
+                        setTimeout(type, 50); // Typing speed
+                    } else if (callback) {
+                        callback();
+                    }
+                }
+                type();
+            }
+
+            // --- App Specific Logic ---
+
+            // Trading Dashboard Chart
+            const tradingChartCtx = document.getElementById('tradingChart').getContext('2d');
+            const chartData = {
+                labels: Array.from({ length: 30 }, (_, i) => `Day ${i + 1}`), // Last 30 days
+                datasets: [{
+                    label: 'Mock Stock Price',
+                    data: Array.from({ length: 30 }, () => 100 + Math.random() * 50 - 25), // Initial random data
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1,
+                    fill: false,
+                    pointRadius: 0 // Hide points
+                }]
+            };
+
+            const tradingChart = new Chart(tradingChartCtx, {
+                type: 'line',
+                data: chartData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            ticks: { color: 'var(--text-color-dark)' },
+                            grid: { color: 'rgba(255,255,255,0.1)' }
+                        },
+                        y: {
+                            ticks: { color: 'var(--text-color-dark)' },
+                            grid: { color: 'rgba(255,255,255,0.1)' }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: 'var(--text-color-dark)'
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 0 // Disable initial animation for continuous updates
+                    }
+                }
+            });
+
+            // Update chart and mock prices
+            setInterval(() => {
+                // Update mock prices
+                document.getElementById('btc-price').textContent = `$${btcPrice.toFixed(2)}`;
+                document.getElementById('eth-price').textContent = `$${ethPrice.toFixed(2)}`;
+                document.getElementById('spx-price').textContent = `${spxPrice.toFixed(2)}`;
+
+                // Update chart data
+                const newDataPoint = tradingChart.data.datasets[0].data[tradingChart.data.datasets[0].data.length - 1] + (Math.random() - 0.5) * 5;
+                tradingChart.data.datasets[0].data.push(newDataPoint);
+                tradingChart.data.datasets[0].data.shift(); // Remove oldest data point
+                tradingChart.update();
+            }, 2000); // Update every 2 seconds
+
+            // Economic Calendar Event Details
+            const calendarDays = document.querySelectorAll('.calendar-day.has-event');
+            const calendarEventDetails = document.getElementById('calendar-event-details');
+
+            calendarDays.forEach(day => {
+                day.addEventListener('click', () => {
+                    const event = day.dataset.event;
+                    calendarEventDetails.innerHTML = `<strong>${day.textContent} July 2025:</strong> ${event}`;
+                });
+            });
+
+            // Reports Window - Handle download/view actions with custom notification
+            document.querySelectorAll('.download-report').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const reportName = e.target.dataset.reportName;
+                    const action = e.target.textContent.includes('Download') ? 'download' : 'opening';
+                    showNotification(`Simulating ${action} for: ${reportName}`, 'default', 4000);
+                });
+            });
+
+
+            // Analyst Chat
+            const chatInput = document.getElementById('chat-input');
+            const sendChatBtn = document.getElementById('send-chat-btn');
+            const chatMessagesContainer = document.getElementById('chat-messages');
+
+            const addChatMessage = (sender, text, isUser = false) => {
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('chat-message');
+                messageDiv.classList.add(isUser ? 'user' : 'analyst');
+                messageDiv.innerHTML = `<div class="sender">${sender}</div><div class="text">${text}</div>`;
+                chatMessagesContainer.appendChild(messageDiv);
+                chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight; // Scroll to bottom
+            };
+
+            sendChatBtn.addEventListener('click', () => {
+                const message = chatInput.value.trim();
+                if (message) {
+                    addChatMessage('You', message, true);
+                    chatInput.value = '';
+
+                    // Simulate AI auto-reply
+                    setTimeout(() => {
+                        const replies = [
+                            "Understood. We'll monitor that.",
+                            "Good point. I'll check with the team.",
+                            "Thanks for the update!",
+                            "Noted. We'll factor that into our analysis.",
+                            "Interesting. Let's discuss this further in the morning brief."
+                        ];
+                        const randomReply = replies[Math.floor(Math.random() * replies.length)];
+                        addChatMessage('AI Assistant', randomReply);
+                    }, 2000);
+                }
+            });
+
+            chatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendChatBtn.click();
+                }
+            });
+
+            // Risk Calculator
+            const calculateRiskBtn = document.getElementById('calculate-risk-btn');
+            const riskCalculatorResults = document.getElementById('risk-calculator-results');
+
+            calculateRiskBtn.addEventListener('click', () => {
+                const capital = parseFloat(document.getElementById('capital').value);
+                const riskPercent = parseFloat(document.getElementById('risk-percent').value);
+                const entryPrice = parseFloat(document.getElementById('entry-price').value);
+                const stopLossPrice = parseFloat(document.getElementById('stop-loss-price').value);
+                const targetPrice = parseFloat(document.getElementById('target-price').value);
+
+                if (isNaN(capital) || isNaN(riskPercent) || isNaN(entryPrice) || isNaN(stopLossPrice)) {
+                    showNotification("Please enter valid numbers for Capital, Risk %, Entry, and Stop Loss.", 'default', 5000);
+                    return;
+                }
+                if (stopLossPrice >= entryPrice) {
+                    showNotification("Stop Loss must be below Entry Price for a long position. Adjust for short positions.", 'default', 5000);
+                    return;
+                }
+
+                const riskAmount = capital * (riskPercent / 100);
+                const riskPerShare = Math.abs(entryPrice - stopLossPrice); // Use Math.abs for risk per share
+                if (riskPerShare === 0) {
+                    showNotification("Entry Price and Stop Loss Price cannot be the same.", 'default', 5000);
+                    return;
+                }
+
+                const sharesUnits = Math.floor(riskAmount / riskPerShare);
+
+                let potentialReward = 0;
+                let riskRewardRatio = 'N/A';
+
+                // Calculate potential reward based on position type (long/short)
+                if (!isNaN(targetPrice)) {
+                    if (entryPrice > stopLossPrice) { // Long position
+                        if (targetPrice > entryPrice) {
+                            potentialReward = (targetPrice - entryPrice) * sharesUnits;
+                            riskRewardRatio = `${((targetPrice - entryPrice) / riskPerShare).toFixed(2)}:1`;
+                        }
+                    } else { // Short position (entry < stop loss)
+                        if (targetPrice < entryPrice) {
+                            potentialReward = (entryPrice - targetPrice) * sharesUnits;
+                            riskRewardRatio = `${((entryPrice - targetPrice) / riskPerShare).toFixed(2)}:1`;
+                        }
+                    }
+                }
+
+
+                riskCalculatorResults.innerHTML = `
+                    <p>Risk Amount: <span>$${riskAmount.toFixed(2)}</span></p>
+                    <p>Shares/Units: <span>${sharesUnits}</span></p>
+                    <p>Risk per Share: <span>$${riskPerShare.toFixed(2)}</span></p>
+                    <p>Potential Reward: <span>$${potentialReward.toFixed(2)}</span></p>
+                    <p>Risk:Reward Ratio: <span>${riskRewardRatio}</span></p>
+                `;
+            });
+
+            // Backtest Tool
+            const runBacktestBtn = document.getElementById('run-backtest-btn');
+            const backtestResults = document.getElementById('backtest-results');
+
+            runBacktestBtn.addEventListener('click', () => {
+                const strategy = document.getElementById('strategy-input').value.trim();
+                if (!strategy) {
+                    showNotification("Please enter a mock strategy to run the backtest.", 'default', 5000);
+                    return;
+                }
+
+                // Simulate backtest results
+                const totalTrades = Math.floor(Math.random() * 200) + 50; // 50-250 trades
+                const winningTrades = Math.floor(totalTrades * (0.3 + Math.random() * 0.4)); // 30-70% win rate
+                const losingTrades = totalTrades - winningTrades;
+                // Simulate profit/loss - ensuring it can be negative
+                const netProfitLoss = (winningTrades * (Math.random() * 500 + 50) - losingTrades * (Math.random() * 200 + 50)).toFixed(2);
+                const winRate = ((winningTrades / totalTrades) * 100).toFixed(2);
+
+                backtestResults.innerHTML = `
+                    <p>Historical Results for: <em>"${strategy.substring(0, 50)}..."</em></p>
+                    <p>Total Trades: <span>${totalTrades}</span></p>
+                    <p>Winning Trades: <span>${winningTrades}</span></p>
+                    <p>Losing Trades: <span>${losingTrades}</span></p>
+                    <p>Net Profit/Loss: <span>$${netProfitLoss}</span></p>
+                    <p>Win Rate: <span>${winRate}%</span></p>
+                `;
+            });
+
+            // News Feed
+            const newsFeedContent = document.getElementById('news-feed-content');
+            const mockNewsHeadlines = [
+                { headline: "Global Markets Brace for Key Inflation Data Release", source: "Reuters" },
+                { headline: "Tech Giants Report Mixed Earnings, Sector Volatility Expected", source: "Bloomberg" },
+                { headline: "Central Banks Signal Dovish Stance Amid Economic Slowdown Fears", source: "Financial Times" },
+                { headline: "Oil Prices Surge on Geopolitical Tensions in Middle East", source: "Wall Street Journal" },
+                { headline: "Cryptocurrency Adoption Accelerates, Institutional Interest Grows", source: "CoinDesk" },
+                { headline: "Analyst Upgrades: Tesla (TSLA) Target Price Raised to $300", source: "MarketWatch" },
+                { headline: "New Regulations Proposed for Decentralized Finance (DeFi) Sector", source: "The Economist" }
+            ];
+            let newsIndex = 0;
+
+            const updateNewsFeed = () => {
+                newsFeedContent.innerHTML = ''; // Clear existing news
+                for (let i = 0; i < 3; i++) { // Show 3 news items at a time
+                    const newsItem = mockNewsHeadlines[(newsIndex + i) % mockNewsHeadlines.length];
+                    const div = document.createElement('div');
+                    div.classList.add('news-item');
+                    div.innerHTML = `
+                        <div class="headline">${newsItem.headline}</div>
+                        <div class="source">Source: ${newsItem.source}</div>
+                    `;
+                    newsFeedContent.appendChild(div);
+                }
+                newsIndex = (newsIndex + 1) % mockNewsHeadlines.length;
+            };
+
+            setInterval(updateNewsFeed, 7000); // Rotate news every 7 seconds
+            updateNewsFeed(); // Initial news load
+        });
+    </script>
+</body>
+</html>
